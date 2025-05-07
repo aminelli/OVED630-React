@@ -256,7 +256,7 @@ function curry<T, U, V>(fn: (t: T, u: U) => V): (t: T) => (u: U) => V {
 
 // Gestione errori nelle composition
 
-  // Tipo Result per gestire successo/fallimento
+// Tipo Result per gestire successo/fallimento
 type Result<T> = { success: true; value: T } | { success: false; error: Error };
 
 // Funzioni che restituiscono Result
@@ -278,4 +278,101 @@ function composeResult<T, U, V>(
     return f(resultG.value);
   };
 }
+
+
+// COMPOSIZIONI DI FUNZIONI asincrone
+
+// Pipe asincrono per Promise
+function pipeAsync<T>(...fns: Array<(arg: T) => Promise<T> | T>): (arg: T) => Promise<T> {
+    return async (x: T) => {
+      let result = x;
+      for (const fn of fns) {
+        result = await fn(result);
+      }
+      return result;
+    };
+  }
+
+
+ // Esempio 
+ /*
+ const processUserPiped = (userId: number) => 
+  fetchUser(userId)
+    .then(pipeAsync(
+      normalizeEmail,
+      validateUser,
+      user => saveUserToDatabase(user).then(() => user)
+    ))
+    .then(() => true)
+    .catch(error => {
+      console.error("Error:", error);
+      return false;
+    }); 
+
+ */
+
+
+// POINT FREE STYLE
+
+// Point-free composition
+const isEven = (n: number): boolean => n % 2 === 0;
+const isPositive = (n: number): boolean => n > 0;
+
+// Versione tradizionale del codice
+const isPositiveEven = (n: number): boolean => isEven(n) && isPositive(n);
+
+// Versione point-free
+const and = <T>(
+    f: (x:T) => boolean, 
+    g: (x:T) => boolean
+) => (x:T): boolean => f(x) && g(x);
+const isPositiveEvenPointFree = and (isEven, isPositive);
+
+console.log(isPositiveEvenPointFree(4));
+
+
+/// UTILIZZO FP-TS
+
+import { Option, some, none, isSome } from "fp-ts/Option";
+
+interface User3 {
+    name: string,
+    email: string
+}
+
+
+const findUserById = (id: number): Option<User3> => 
+    id === 1 ? some({ id, name: "John", email: "B2K6w@example.com" }) : none;
+
+const userOption = findUserById(1);
+console.log(userOption);
+
+if (isSome(userOption)) {
+    console.log("User Found:", userOption.value.name);
+} else {
+    console.log("User not found");
+}
+
+
+// Uso Either per try/catch
+
+import { Either, right, left, isRight } from "fp-ts/Either";
+
+const divide = (a: number, b: number): Either<String, number> =>
+    b === 0 ? left("Division by zero") : right(a / b);
+    
+const result01 = divide(10, 0);
+
+if (isRight(result01)) {
+    console.log("Division result:", result01.right);
+} else {
+    console.log("Error:", result01.left);
+}
+
+
+
+
+
+
+
 
