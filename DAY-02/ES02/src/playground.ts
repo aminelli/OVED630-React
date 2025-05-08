@@ -69,3 +69,83 @@ console.log(api1 === api2);
 const classData = Reflect.getMetadata(classMetadataKey, APIService);
 console.log("Dati della classe:", classData);
 
+
+
+// DECORATORE DI METODI
+
+// Decoratore per misurazione performance
+function MeasureTime(
+    target: Object,
+    propertyKey: string | symbol,
+    descriptor: PropertyDescriptor
+  ) {
+    const originalMethod = descriptor.value;
+    
+    descriptor.value = function(...args: any[]) {
+      const start = performance.now();
+      const result = originalMethod.apply(this, args);
+      const end = performance.now();
+      console.log(`${String(propertyKey)} execution time: ${end - start} ms`);
+      return result;
+    };
+    
+    return descriptor;
+  }
+
+
+  // Decoratore per caching
+  function Caching(
+    target: Object,
+    propertyKey: string | symbol,
+    descriptor: PropertyDescriptor
+  ) {
+    const originalMethod = descriptor.value;
+    const cache = new Map<string, any>();
+    
+    descriptor.value = function(...args: any[]) {
+      const key = JSON.stringify(args);
+      if (cache.has(key)) {
+        console.log(`Cache hit for ${String(propertyKey)}`);
+        return cache.get(key);
+      }
+      
+      const result = originalMethod.apply(this, args);
+      cache.set(key, result);
+      return result;
+    };
+    
+    return descriptor;
+  }
+
+  // Decoratore pre forzare retry
+  function Retry(attempts: number, delay: number = 0) {
+    return function(
+      target: Object,
+      propertyKey: string | symbol,
+      descriptor: PropertyDescriptor
+    ) {
+      const originalMethod = descriptor.value;
+      
+      descriptor.value = async function(...args: any[]) {
+        let error: Error | null = null;
+        
+        for (let i = 0; i < attempts; i++) {
+          try {
+            return await originalMethod.apply(this, args);
+          } catch (err) {
+            error = err as Error;
+            console.log(`Attempt ${i + 1} failed. Retrying...`);
+            
+            if (delay > 0 && i < attempts - 1) {
+              await new Promise(resolve => setTimeout(resolve, delay));
+            }
+          }
+        }
+        
+        throw error;
+      };
+      
+      return descriptor;
+    };
+  }
+  
