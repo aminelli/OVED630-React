@@ -148,4 +148,30 @@ function MeasureTime(
       return descriptor;
     };
   }
+
+  class DataProcessor {
+
+    @MeasureTime
+    @Caching
+    complexCalc(input: number) : number {
+        console.log('Processing data...');
+        let result = 0;
+        for (let count = 0; count < 1000000; count++) {
+            result += Math.sin(input * count);
+        }
+        return result;
+    }
+
+    @Retry(3, 1000)
+    async fetchData(url: string) : Promise<any> {
+        console.log(`Fetching data from ${url}`);
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch data from ${url}`);
+        }
+        
+        return await response.json;
+    }
+
+  }
   
