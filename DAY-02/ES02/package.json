@@ -1,0 +1,26 @@
+{
+  "name": "ts-playground",
+  "version": "1.0.0",
+  "main": "dist/playground.js",
+  "description": "Applciazione modello per eseguire codice typescript",
+  "scripts": {
+    "start": "ts-node src/playground.ts",
+    "dev": "nodemon --exec ts-node src/playground.ts",
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "keywords": [
+    "typescript",
+    "playground"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "ts-playground": "file:"
+  }
+}
