@@ -420,7 +420,6 @@ function Autowired(target: Object, propertyKey: string) {
 
         const instance = new serviceClass();
         
-
         const autowiredData = Reflect.getMetadata('autowired', serviceClass);
         if (autowiredData) {
             const { propertyKey, type} = autowiredData; //  as { propertyKey: string, type: any };
