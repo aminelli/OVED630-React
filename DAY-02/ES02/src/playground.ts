@@ -175,3 +175,150 @@ function MeasureTime(
 
   }
   
+
+
+  // DECORATORE DI PROPRIETA'
+
+  function Observable(target: Object, propertyKey: string){
+
+    const privateField = `_${propertyKey}`;
+
+    Object.defineProperty(target, propertyKey, {
+      get: function() {
+        console.log(`Getting ${propertyKey}`);
+        return this[privateField];
+      },
+      set: function(value:any) {
+        console.log(`Setting ${propertyKey} to ${value}`);
+        const oldValue = this[privateField];
+        this[privateField] = value;
+
+        // Emettiamo evento per il change della property
+        this.propertyChanged?.(propertyKey, oldValue, value);
+      },
+      enumerable: true,
+      configurable: true
+    });
+
+  }
+
+  // Decorator per validazione
+  function Validate(validator: (value: any) => boolean, errorMessage: string) {
+    return function(target: Object, propertyKey: string) {
+      const privateField = `_${propertyKey}`;
+      
+      Object.defineProperty(target, propertyKey, {
+        get() {
+          return this[privateField];
+        },
+        set(value: any) {
+          if (!validator(value)) {
+            throw new Error(`Validation failed for ${propertyKey}: ${errorMessage}`);
+          }
+          this[privateField] = value;
+        },
+        enumerable: true,
+        configurable: true,
+      });
+    };
+  }   
+
+
+  function SerializeJson(target: Object, propertyKey: string) {
+    const privateField = `_${propertyKey}`;
+    
+
+    Object.defineProperty(target, propertyKey, {
+      get() {
+        try {
+          return JSON.parse(this[privateField] || '{}');
+        } catch (error) {
+          return {};
+        }        
+      },
+      set(value: any) {
+        this[privateField] = JSON.stringify(value);
+      },
+      enumerable: true,
+      configurable: true,
+    });
+  }
+
+
+class MyUser {
+    propertyChanged?(name: string, oldValue: any, newValue:any): void;
+
+    @Observable
+    userName: string = '';
+
+    @Validate(value => typeof value === 'number' && value > 0, 'Age must be greater than 0')
+    age: number = 0;
+
+    @SerializeJson
+    settings: any = {};
+
+    constructor() {
+        this.propertyChanged = (name, oldValue, newValue) => {
+            console.log(`Property ${name} changed from ${oldValue} to ${newValue}`);
+        };
+    }
+
+}
+
+
+
+  // DECORATORE DI PARAMETRI
+
+  // Decoratore per convalidare parametri
+function ValidateParam(validator: (value: any) => boolean, errorMessage: string) {
+    return function(
+        target: any,
+        propertyKey: string,
+        parameterIndex: number
+    ) {
+        // Recupero del metodo originale
+        const originalMethod = target[propertyKey];
+
+        if (typeof originalMethod === 'function') {
+            target[propertyKey] = function(...args: any[]) {
+                
+                const valueToValidate = args[parameterIndex];
+
+                if (!validator(valueToValidate)) {
+                    throw new Error(`Parameter ${parameterIndex} validation failed: ${errorMessage}`);
+                }
+                return originalMethod.apply(this, args);
+            };
+        }
+
+        return target;
+    }
+}
+  
+// Validatore per numeri positivi
+function isPositive(value: number): boolean {
+    return typeof value === 'number' && value > 0;
+}   
+
+function isNotEmptyString(value: string): boolean {
+    return typeof value === 'string' && value?.trim().length > 0;
+}   
+
+class TestValidators {
+
+    calculateAreaSquare(
+        @ValidateParam(isPositive, 'Width must be positive') width: number, 
+        @ValidateParam(isPositive, 'Width must be positive') height: number
+    ) : number {
+        return width * height;
+    }
+
+    printName(
+        @ValidateParam(isNotEmptyString, 'Name must not be empty') name: string
+    ) {
+         console.log(name);
+    }
+
+}
+
+
