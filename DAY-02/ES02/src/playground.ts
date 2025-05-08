@@ -322,3 +322,123 @@ class TestValidators {
 }
 
 
+// Decoratore per iniettare parametri
+function Inject(serviceIdentifier: string) {
+    return function(target: Object, methodName: string | symbol, parameterIndex: number) {
+      // Salviamo i metadati per l'iniezione delle dipendenze
+      const existingRequiredParams: Record<number, string> = 
+        Reflect.getOwnMetadata('inject:params', target, methodName as string) || {};
+      
+      existingRequiredParams[parameterIndex] = serviceIdentifier;
+      
+      Reflect.defineMetadata(
+        'inject:params',
+        existingRequiredParams,
+        target,
+        methodName as string
+      );
+    };
+  }
+
+  class UserService {
+
+    processUser(
+        @Inject('LoggerService') logger: any,
+        user: any
+    ) {
+        logger.log(user);
+        return user; 
+    }
+  }
+
+
+const Injectable = (): ClassDecorator => {
+    return (target: any) => {
+        Reflect.defineMetadata('injectable', true, target);
+    }
+}
+
+@Injectable()
+class LogService {
+    log(message: string) {
+        console.log(`[LOG] ${message}`);
+    }
+}
+
+function Autowired(target: Object, propertyKey: string) {
+    const type = Reflect.getMetadata('design:type', target, propertyKey);
+    
+    Reflect.defineMetadata(
+        'autowired',
+        { propertyKey, type},
+        target.constructor
+    );
+  }
+
+  @Injectable()
+  class AuthService {
+    @Autowired
+    logService!: LogService;
+
+    authenticate(user: string, password: string) {
+        this.logService.log(`${user} ${password}`);
+    }
+  } 
+
+  function Route(path: string) {
+    return function(
+        target: Object,
+        propertyKey: string,
+        descriptor: PropertyDescriptor
+    ) {
+        Reflect.defineMetadata(
+            'route',
+            { path, method: propertyKey },
+            target.constructor
+        );
+    }
+  }
+
+  @Injectable()
+  class UserController {
+    @Autowired
+    private authService!: AuthService;
+
+    login(user: string, password: string) {
+        return this.authService.authenticate(user, password);
+    }
+  }
+
+
+  class DIContainer {
+    private static services = new Map<Function, Object>();
+
+    static register<T>(serviceClass: new (...args: any[]) => T) : void {
+        if (!Reflect.getMetadata('injectable', serviceClass)) {
+            throw new Error('Class is not injectable');
+        }
+
+        const instance = new serviceClass();
+        
+
+        const autowiredData = Reflect.getMetadata('autowired', serviceClass);
+        if (autowiredData) {
+            const { propertyKey, type} = autowiredData; //  as { propertyKey: string, type: any };
+           
+            instance[propertyKey as keyof T] = DIContainer.get(type);
+        }
+    }
+
+    static get<T>(serviceClass: new (...args: any[] ) => T) : T {
+        if (!DIContainer.services.has(serviceClass)) {
+            DIContainer.register(serviceClass);
+        }
+        return DIContainer.services.get(serviceClass) as T;
+    }
+
+
+  }
+  
+
+
+
