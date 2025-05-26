@@ -8,7 +8,7 @@ export default function HomePage() {
             Esempio React-Next.Js con Layouts Avanzati
           </h1>
           <p className="text-x1 text-gray-600">
-              DEmo di uso avanzato di layouts e pages con react 19 e neaxt.js 15
+              Demo di uso avanzato di layouts e pages con react 19 e neaxt.js 15
           </p>
         </div>
 
