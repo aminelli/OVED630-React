@@ -1,6 +1,6 @@
 'use client';
 
-import React , { useState, useCallBack, useDeferredValue } from 'react';
+import React , { useState, useCallback, useDeferredValue } from 'react';
 
 interface SearchBoxProps {
     onSearch: (query: string) => void;
@@ -16,8 +16,8 @@ export default function SearchBox({ onSearch, placeholder ="Cerca..." }: SearchB
     const deferredQuery = useDeferredValue(query);
 
     // UseCallBack: usato per ottimizzare le performance
-    const handleSearch = useCallBack((query: string) => {
-        setQuery(query);
+    const handleSearch = useCallback((value: string) => {
+        setQuery(value);
     }, []);
 
     // Effetto per chiamare onSerach quando cambia deferredQuery
@@ -32,7 +32,7 @@ export default function SearchBox({ onSearch, placeholder ="Cerca..." }: SearchB
         value={query}
         onChange={(e) => handleSearch(e.target.value)}
         placeholder={placeholder}
-        className="w-full px-4 py-2 pl-10 pr-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        className="text-gray-900 w-full px-4 py-2 pl-10 pr-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
       />
       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
         <span className="text-gray-400">🔍</span>

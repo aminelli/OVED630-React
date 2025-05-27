@@ -32,7 +32,7 @@ export default function PostCard({ post, author }: PostCardProps) {
         </div>
       </header>
       
-      <div className="prose prose-gray max-w-none mb-4">
+      <div className="text-gray-500 max-w-none mb-4">
         <p>{post.content}</p>
       </div>
 

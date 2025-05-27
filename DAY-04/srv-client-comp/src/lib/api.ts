@@ -8,9 +8,9 @@ export async function getUsers(): Promise<ApiResponse<User[]>> {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     const users: User[] = [
-        { id: 1, name: 'John Doe', email: 'Gt0Mw@example.com' },
-        { id: 2, name: 'Jane Doe', email: 'Gt0Mw@example.com' },
-        { id: 3, name: 'Joe Doe', email: 'Gt0Mw@example.com' },
+        { id: 1, name: 'Antonio Minelli', email: 'am@example.com' },
+        { id: 2, name: 'Lucio Rossi', email: 'lr@example.com' },
+        { id: 3, name: 'Mario Bianchi', email: 'mb@example.com' },
     ];
 
     return {
