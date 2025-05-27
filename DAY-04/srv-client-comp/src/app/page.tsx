@@ -31,7 +31,7 @@ async function UsersSection() {
 async function PostsSection() {
   const [postsResponse, usersResponse] = await Promise.all([
     getPosts(),
-    getUsers
+    getUsers()
   ]);
 
   if (!postsResponse.success) {

@@ -1,7 +1,8 @@
 
 import React from 'react';
-import { User, Post } from '@types';
-import InteractivePostActions from '@/componentsInteractivePostActions';
+import { User, Post } from '../types/index';
+import InteractivePostActions from './InteractivePostActions';
+
 
 
 interface PostCardProps {
