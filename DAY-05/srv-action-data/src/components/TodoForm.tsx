@@ -27,8 +27,9 @@ export default function TodoForm({ users} : TodoFormProps) {
 
     return (
 
-        <form action={formAction} method="post" className="flex flex-col gap-2">
-        
+        <form action={formAction} className="form">
+            <h2>Crea un nuovo todo</h2>
+
             <div className="form-group">
                 <label htmlFor="title">Titolo</label>
                 <input type="text" name="title" id="title" required placeholder="Inserisci il titolo" disabled={isPending}/>

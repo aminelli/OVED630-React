@@ -31,6 +31,13 @@ export interface TodoItem {
 }
 
 
+export interface StreamingLoading {
+    users: boolean,
+    posts: boolean,
+    comments: boolean,
+    todos: boolean
+}
+
 export type StreamingData = {
     users: User[];
     posts: Post[];

@@ -1,5 +1,6 @@
 import { fetchTodos, fetchUsers } from "@/lib/actions";
-import TodoForm from "../components/TodoForm";
+import TodoForm from "../../components/TodoForm";
+import TodoList from "../../components/TodoList";
 
 
 
@@ -16,6 +17,7 @@ export default async function TodosPage() {
             <p>CRUD Example</p>
 
             <TodoForm users={users} />
+            <TodoList todos={todos} users={users} />
         </div>
     );
 }
