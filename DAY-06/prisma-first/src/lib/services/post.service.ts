@@ -45,6 +45,16 @@ export class PostService {
     }
 
 
+
+     /* id: string
+          email: string
+          name: string | null
+          password: string
+          role: $Enums.Role
+          createdAt: Date
+          updatedAt: Date
+          */
+
     static async getPostById(id: string): Promise<PostWithAuthor | null> {
         return prisma.post.findUnique({
             where: {
@@ -56,7 +66,8 @@ export class PostService {
                         id: true,
                         name: true,
                         email: true,
-                        role: true
+                        role: true,
+                        password: true
                     }
                 },
                 tags: true,

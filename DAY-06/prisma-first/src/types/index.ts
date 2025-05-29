@@ -5,14 +5,14 @@ export type UserWithPosts = User & {
 };
 
 export type PostWithAuthor = Post & {
-    author: User;
+    author: Partial<User>;
     tags: Tag[];
     comments: CommentWithAuthor[];
 };
 
 
 export type CommentWithAuthor = Comment & {
-    author: User;
+    author: Partial<User>;
 };
 
 

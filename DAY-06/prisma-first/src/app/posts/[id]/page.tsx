@@ -2,14 +2,11 @@ import { PostService } from "@/lib/services/post.service";
 import { notFound } from "next/navigation";
 
 
-interface PostDetailPageProps {
-    params: { id: string };
-}
-
-
-export default async function PostDetailPage({ params }: PostDetailPageProps) {
+export default async function PostDetailPage({ params }: { params: Promise<{ id: string }>}) {
  
-    const post = await PostService.getPostById(params.id);
+    const { id } = await params;
+
+    const post = await PostService.getPostById(id);
 
     if (!post) {
         notFound();
@@ -45,7 +42,7 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
             </div>
             
             <section>
-                <h2 className="text-2xl font-bold mb-4">Comments: {post.comments.lenght}</h2>
+                <h2 className="text-2xl font-bold mb-4">Comments: {post.comments.length}</h2>
                 <div className="space-y-4">
                     {post.comments.map((comment) => (
                         <div key={comment.id} className="border-l-4 border-blue-200 pl-4">
